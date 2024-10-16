@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link th:href="@{/styles/view.css}" rel="stylesheet"/>
+    <title>Document</title>
+</head>
+
+<body>
+<div class="sidenav">
+    <a href="#about">О приложении</a>
+    <a href="/charts">Мониторинг</a>
+    <a href="/turbines.html">Турбины</a>
+    <a href="/boilers.html">Котлы</a>
+</div>
+
+<div class="main">
+    <form th:action="@{/charts}" th:object="${params}" method="get" style="display: flex; flex-direction: row;">
+
+        <label for="startDate">От:</label><br>
+        <input type="date" id=startDate th:name="startDate" th:value="${startDate}">
+
+        <label for="endDate">До:</label><br>
+        <input type="date" id=endDate th:name="endDate" th:value="${endDate}">
+
+        <button type="submit">Поиск</button>
+
+    </form>
+
+    <div id="boiler_steam_chart" style="width: 85%; height: 500px; "></div>
+    <div id="turbine_pressure_chart" style="width: 85%; height: 500px;"></div>
+</div>
+</body>
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript" th:inline="javascript">
+  google.charts.load('current', { 'packages': ['corechart'] });
+  google.charts.setOnLoadCallback(drawBoilerSteamChart);
+  google.charts.setOnLoadCallback(drawTurbinePressureChart);
+
+  function drawBoilerSteamChart() {
+    var data = google.visualization.arrayToDataTable(/*[[${steamMetrics}]]*/ []);
+    var chart = new google.visualization.ComboChart(document.getElementById('boiler_steam_chart'));
+    chart.draw(data, {
+      title: 'Выроботка пара',
+      vAxis: { title: 'Тонны' },
+      hAxis: { title: 'Дата' },
+      seriesType: 'bars',
+      series: { 5: { type: 'line' } }
+    });
+  }
+
+  function drawTurbinePressureChart() {
+    var data = google.visualization.arrayToDataTable(/*[[${pressureMetrics}]]*/ []);
+    var chart = new google.visualization.LineChart(document.getElementById('turbine_pressure_chart'));
+    chart.draw(data, {
+      title: 'Давление, МПа',
+      curveType: 'function',
+      legend: { position: 'bottom' }
+    });
+  }
+</script>
+</html>
